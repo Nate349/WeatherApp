@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">OpenWeather App</string>
+    <string name="location">Location</string>
+    <string name="input_location">Input Location</string>
+    <string name="weathericon">weatherIcon</string>
+    <string name="_8am">8am</string>
+</resources>
