@@ -125,6 +125,12 @@ public class WeatherRunnable implements Runnable{
                     Hourly hour = hourlyParser((JSONObject) hourlyArray.get(i));
                     hourly[i] = hour;
                 }
+                JSONArray dailyArray = jObjMain.getJSONArray("daily");
+                Daily[] daily = new Daily[dailyArray.length()];
+                for (int i = 0; i < dailyArray.length(); i++) {
+                Daily day = dailyParser((JSONObject) dailyArray.get(i));
+                daily[i] = day;
+                }
 
 
         } catch (Exception e) {
@@ -147,6 +153,7 @@ public class WeatherRunnable implements Runnable{
 
         return new String[0];
     }
+
     public Hourly hourlyParser(JSONObject hourly){
         try {
             String dt = hourly.getString("dt");
@@ -159,8 +166,29 @@ public class WeatherRunnable implements Runnable{
         } catch (JSONException e){
             e.printStackTrace();
         }
+        return new Hourly("","","","","");
+    }
+    public Daily dailyParser(JSONObject daily){
+        try {
+            String dt = daily.getString("dt");
+            JSONObject tempJsonObject = daily.getJSONObject("temp");
+            String day = tempJsonObject.getString("day");
+            String min = tempJsonObject.getString("min");
+            String max = tempJsonObject.getString("max");
+            String night = tempJsonObject.getString("night");
+            String eve = tempJsonObject.getString("eve");
+            String morn = tempJsonObject.getString("morn");
+            JSONArray weatherJsonArray = daily.getJSONArray("weather");
+            JSONObject weather = (JSONObject) weatherJsonArray.get(0);
+            String[] weatherArray = weatherParser(weather);
+            String pop = daily.getString("pop");
+            String uvi = daily.getString("uvi");
+            return new Daily( dt, day, min, max, night, eve, morn, weatherArray[0], weatherArray[2], weatherArray[3], pop, uvi);
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+        return new Daily("","","","","","","","","","","","");
     }
 }
 
-//return new Weather(dateTime, temp, feelsLike, humidity, UVindex, morningTemp, daytimeTemp, sunrise, sunset, eveningTemp, nightTemp, visability, winds, weatherDiscription, weatherIcon);
 

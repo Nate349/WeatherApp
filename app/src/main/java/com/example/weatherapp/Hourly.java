@@ -1,7 +1,5 @@
 package com.example.weatherapp;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.Serializable;
 
