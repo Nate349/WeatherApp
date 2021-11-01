@@ -24,17 +24,18 @@ public class WeatherRunnable implements Runnable{
 
     private final MainActivity main;
     private final String city;
+    private final double latitude;
+    private final double longitude;
     private final boolean fahrenheit;
-    //TODO get the urls
-    private static final String weatherURL = "";
-    private static final String iconUrl = "";
-    // Sign up to get your API Key at:  https://home.openweathermap.org/users/sign_up
-    private static final String yourAPIKey = "6bfc226f3d6885de5b239a8c33047524";
+    private static final String weatherURL = "https://api.openweathermap.org/data/2.5/onecall";
+    private static final String yourAPIKey = "3a674edc22beb8182cd6cdb3ee5e2631";
 
 
-    WeatherRunnable(MainActivity main, String city, boolean fahrenheit) {
+    WeatherRunnable(MainActivity main, String city,double latitude,double longitude, boolean fahrenheit) {
         this.main = main;
         this.city = city;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.fahrenheit = fahrenheit;
     }
 
@@ -44,7 +45,17 @@ public class WeatherRunnable implements Runnable{
     public void run() {
         Uri.Builder buildURL = Uri.parse(weatherURL).buildUpon();
 
-        buildURL.appendQueryParameter("q", city);
+        buildURL.appendQueryParameter("lat", String.format(Locale.getDefault(),"%f", latitude));
+        buildURL.appendQueryParameter("lon", String.format(Locale.getDefault(),"%f", longitude));
+        buildURL.appendQueryParameter("appid", yourAPIKey);
+        if(fahrenheit){
+            buildURL.appendQueryParameter("units", "imperial");
+        }
+        else{
+            buildURL.appendQueryParameter("units", "metric");
+        }
+        buildURL.appendQueryParameter("lang", "en");
+        buildURL.appendQueryParameter("exclude", "minutely");
         buildURL.appendQueryParameter("appid", yourAPIKey);
         String urlToUse = buildURL.build().toString();
 
@@ -80,19 +91,29 @@ public class WeatherRunnable implements Runnable{
 
     public void handleResults(final String jsonString) {
 
-        final Weather w = parseJSON(jsonString);
+        final TotalWeather w = parseJSON(jsonString);
         main.runOnUiThread(() -> main.updateData(w));
     }
 
-    private Weather parseJSON(String s) {
+    private TotalWeather parseJSON(String s) {
 
         try {
             JSONObject jObjMain = new JSONObject(s);
-                String timezone = jObjMain.getString("timezone");
-                String timezone_offset = jObjMain.getString("timezone_offset");
+                String latitude = jObjMain.getString("lat");
+                String longitude =jObjMain.getString("lon");
+                String timeZone = jObjMain.getString("timezone");
+                String timeZoneOff = jObjMain.getString("timezone_offset");
 
                 //current
+
                 JSONObject current = jObjMain.getJSONObject("current");
+                JSONArray weatherJsonArray = current.getJSONArray("weather");
+                JSONObject weather = (JSONObject) weatherJsonArray.get(0);
+                String[] weatherArray = weatherParser(weather);
+                String id = weatherArray[0];
+                String main = weatherArray[1];
+                String description = weatherArray[2];
+                String icon = weatherArray[3];
                 String dt = current.getString("dt");
                 String sunrise = current.getString("sunrise");
                 String sunset = current.getString("sunset");
@@ -112,13 +133,7 @@ public class WeatherRunnable implements Runnable{
                 else{
                     windGust = "";
                 }
-                JSONArray weatherJsonArray = jObjMain.getJSONArray("weather");
-                JSONObject weather = (JSONObject) weatherJsonArray.get(0);
-                String[] weatherArray = weatherParser(weather);
-                String id = weatherArray[0];
-                String main = weatherArray[1];
-                String description = weatherArray[2];
-                String icon = weatherArray[3];
+                Weather currentWeather = new Weather(dt,temp,feelsLike,humidity,uvi,sunrise,sunset,visibility,id,main,description,icon,pressure,clouds,windSpeed,windDeg,windGust);
                 JSONArray hourlyArray = jObjMain.getJSONArray("hourly");
                 Hourly[] hourly = new Hourly[hourlyArray.length()];
                 for (int i = 0; i < hourlyArray.length(); i++) {
@@ -132,7 +147,8 @@ public class WeatherRunnable implements Runnable{
                 daily[i] = day;
                 }
 
-
+                TotalWeather totalWeather = new TotalWeather(latitude,longitude,timeZone,timeZoneOff,currentWeather,hourly,daily);
+                return totalWeather;
         } catch (Exception e) {
             e.printStackTrace();
         }

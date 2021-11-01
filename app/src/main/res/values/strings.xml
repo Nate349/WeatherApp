@@ -4,4 +4,8 @@
     <string name="input_location">Input Location</string>
     <string name="weathericon">weatherIcon</string>
     <string name="_8am">8am</string>
+    <string name="locationbutton">locationButton</string>
+    <string name="dailybutton">dailyButton</string>
+    <string name="string_dailybutton" />
+    <string name="temptype">tempType</string>
 </resources>
