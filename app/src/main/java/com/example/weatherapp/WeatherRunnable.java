@@ -28,7 +28,7 @@ public class WeatherRunnable implements Runnable{
     private final double longitude;
     private final boolean fahrenheit;
     private static final String weatherURL = "https://api.openweathermap.org/data/2.5/onecall";
-    private static final String yourAPIKey = "Replace this with your apiKey from open weathermap.org";
+    private static final String yourAPIKey = "Replace this with your apiKey from openweathermap.org";
 
 
     WeatherRunnable(MainActivity main, String city,double latitude,double longitude, boolean fahrenheit) {
