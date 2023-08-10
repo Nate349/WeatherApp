@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity  {
                     refresh();
                 }
             });
-            builder.setMessage("For US locations, enter as 'City', or 'City, State'" + "\nFor international locations enter as 'City, Country'");
+            builder.setMessage("For US locations, enter as 'City', or 'City, State'" + "\nFor international locations, enter as 'City, Country'");
             builder.setTitle("Enter a Location");
 
             AlertDialog dialog = builder.create();
